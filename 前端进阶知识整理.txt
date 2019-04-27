@@ -1,0 +1,147 @@
+npm包管理工具
+NPM是随同NodeJS一起安装的包管理工具，能解决NodeJS代码部署上的很多问题，常见的使用场景有以下几种：
+* 允许用户从NPM服务器下载别人编写的第三方包到本地使用。
+* 允许用户从NPM服务器下载并安装别人编写的命令行程序到本地使用。
+* 允许用户将自己编写的包或命令行程序上传到NPM服务器供别人使用。
+
+Webapck
+webpack把项目当作一个整体，通过一个给定的的主文件，webpack将从这个文件开始找到你的项目的所有依赖文件，使用loaders处理它们，最后打包成一个或多个浏览器可识别的js文件
+Webpack 可以将多种静态资源 js、css、less 转换成一个静态文件，减少了页面的请求。
+Webpack 会给每个模块分配一个唯一的 id 并通过这个 id 索引和访问模块。 在页面启动时，会先执行entry文件夹中的代码，其它模块会在运行 require 的时候再执行。
+四个核心概念：
+* 入口(entry)
+* 输出(output)
+* loader
+* 插件(plugins)
+入口(entry)
+入口起点(entry point)指示 webpack 应该使用哪个模块，来作为构建其内部依赖图的开始。进入入口起点后，webpack 会找出有哪些模块和库是入口起点（直接和间接）依赖的。
+每个依赖项随即被处理，最后输出到称之为 bundles 的文件中
+可以通过在 webpack 配置中配置 entry 属性，来指定一个入口起点（或多个入口起点）。
+出口(output)
+output 属性告诉 webpack 在哪里输出它所创建的 bundles，以及如何命名这些文件。可以通过在配置中指定一个 output 字段，来配置这些处理过程：
+我们通过 output.filename 和 output.path 属性，来告诉 webpack bundle 的名称，以及我们想要生成(emit)到哪里。
+配置 output 选项可以控制 webpack 如何向硬盘写入编译文件。注意，即使可以存在多个入口起点，但只指定一个输出配置。
+在 webpack 中配置 output 属性的最低要求是，将它的值设置为一个对象，包括以下两点：
+* filename 用于输出文件的文件名。
+* 目标输出目录 path 的绝对路径。
+loader
+loader 让 webpack 能够去处理那些非 JavaScript 文件（webpack 自身只理解 JavaScript）。loader 可以将所有类型的文件转换为 webpack 能够处理的有效模块，然后你就可以利用 webpack 的打包能力，对它们进行处理。
+本质上，webpack loader 将所有类型的文件，转换为应用程序的依赖图可以直接引用的模块。
+在更高层面，在 webpack 的配置中 loader 有两个目标。
+1.识别出应该被对应的 loader 进行转换的那些文件。(使用 test 属性)
+2.转换这些文件，从而使其能够被添加到依赖图中（并且最终添加到 bundle 中）(use 属性)
+以上配置中，对一个单独的 module 对象定义了 rules 属性，里面包含两个必须属性：test 和 use。这告诉 webpack 编译器(compiler) 如下信息：
+“嘿，webpack 编译器，当你碰到「在 require()/import 语句中被解析为 '.txt' 的路径」时，在你对它打包之前，先使用 raw-loader 转换一下。”
+插件(plugins)
+loader 被用于转换某些类型的模块，而插件则可以用于执行范围更广的任务。插件的范围包括，从打包优化和压缩，一直到重新定义环境中的变量。插件接口功能极其强大，可以用来处理各种各样的任务。
+想要使用一个插件，你只需要 require() 它，然后把它添加到 plugins 数组中。多数插件可以通过选项(option)自定义。你也可以在一个配置文件中因为不同目的而多次使用同一个插件，这时需要通过使用 new 操作符来创建它的一个实例。
+webpack 插件是一个具有 apply 属性的 JavaScript 对象。apply 属性会被 webpack compiler 调用，并且 compiler 对象可在整个编译生命周期访问。
+
+WebPack和Grunt以及Gulp相比有什么特性
+其实Webpack和另外两个并没有太多的可比性，Gulp/Grunt是一种能够优化前端的开发流程的工具，而WebPack是一种模块化的解决方案，不过Webpack的优点使得Webpack在很多场景下可以替代Gulp/Grunt类的工具。
+Grunt和Gulp的工作方式是：在一个配置文件中，指明对某些文件进行类似编译，组合，压缩等任务的具体步骤，工具之后可以自动替你完成这些任务。
+Webpack的工作方式是：把你的项目当做一个整体，通过一个给定的主文件（如：index.js），Webpack将从这个文件开始找到你的项目的所有依赖文件，使用loaders处理它们，最后打包为一个（或多个）浏览器可识别的JavaScript文件。
+如果实在要把二者进行比较，Webpack的处理速度更快更直接，能打包更多不同类型的文件。
+
+性能优化相关
+1.减少http请求（减少请求数，降低请求量）
+	① 合并脚本 （webpack、gulp）
+	② css雪碧图
+	③ 文件压缩
+	④ 图片懒加载
+	⑤ 避免重定向
+2.代码优化
+	① 减少重绘与重排
+			减少DOM操作
+			通过改变class，一次性地改变样式
+			如果需要对一个节点进行多次DOM操作，先将它的display设置为none
+3.设置缓存
+	① Expires/  Cache-Control
+	② 服务端Last-Modified            客户端If-Modified-Since
+	③服务端指定Etag                       客户端If-None-Match
+
+关于http缓存的细节：
+
+1.强缓存：用户发送的请求，直接从客户端缓存中获取，不发送请求到服务器，不与服务器发生交互行为。
+描述强缓存的是服务器端的response header里的两个字段：expires 、Cache-Control
+expires：Thu, 28 Sep 2017 06:38:37 GMT
+Http1.0 中的标准，表示过期时间，它指的是服务器端的绝对时间，但是在客户端比较的是客户端的本地时间，所以可能存在偏差
+Cache-Control：max-age=263563
+Http1.1 中的标准，可以看成是 expires 的补充。使用的是相对时间的概念。
+简单介绍下Cache-Control的属性设置。
+1）max-age: 设置缓存的最大的有效时间，单位为秒（s）。max-age会覆盖掉Expires
+3) public：响应会被缓存，并且在多用户间共享。默认是public。
+4) private: 响应只作为私有的缓存，不能在用户间共享。如果要求HTTP认证，响应会自动设置为private。
+5）no-cache:指定不缓存响应，表明资源不进行缓存。但是设置了no-cache之后并不代表浏览器不缓存，而是在缓存前要向服务器确认资源是否被更改。因此有的时 候只设置no-cache防止缓存还是不够保险，还可以加上private指令，将过期时间设为过去的时间。
+6）no-store: 绝对禁止缓存。
+
+2.协商缓存：用户发送的请求，发送到服务器后，由服务器判定是否从缓存中获取资源。
+浏览器向服务器发送请求，如果上一次的缓存中有Last-modified 和 Etag 字段，
+浏览器将在request header 中加入If-Modified-Since（对应于Last-modified）， 和If-None-Match（对应于Etag）。
+Last-modified: 表明请求的资源上次的修改时间。
+If-Modified-Since：客户端保留的资源上次的修改时间。
+Etag：资源的内容标识。（不唯一，通常为文件的md5或者一段hash值，只要保证写入和验证时的方法一致即可）
+If-None-Match： 客户端保留的资源内容标识。
+如果资源没被修改过，就直接返回304状态码，告知浏览器使用缓存，否则返回200和请求内容。
+
+
+
+
+
+
+
+vue和jQuery的本质区别
+jQuery是使用选择器（$）选取DOM对象，对其进行赋值、取值、事件绑定等操作，其实和原生的HTML的区别只在于可以更方便的选取和操作DOM对象，而数据和界面是在一起的。比如需要获取label标签的内容：$("lable").val();,它还是依赖DOM元素的值。?
+Vue则是通过Vue对象将数据和View完全分离开来了。对数据进行操作不再需要引用相应的DOM对象，可以说数据和View是分离的，他们通过Vue对象这个vm实现相互的绑定
+
+vue-cli
+使用vue-cli搭建项目
+npm install --g vue-cli 全局下载脚手架
+vue init webpack test 生成项目 形成基本结构
+npm install 依赖包
+npm run dev 启动项目
+双向绑定/数据驱动
+Vue数据驱动（双向数据绑定）的原理？
+双向绑定就是当数据发生变化的时候，用户界面发生相应的变化，开发者不需要手动的去修改dom。它的原理就是vuejs在实例化的过程中，会对实例化对象选项中的data 选项进行遍历，遍历其所有属性并使用 Object.defineProperty 把这些属性全部转为 getter/setter。同时每一个实例对象都有一个watcher实例对象，他会在模板编译的过程中,用getter去访问data的属性，watcher此时就会把用到的data属性记为依赖，这样就建立了视图与数据之间的联系。当之后我们渲染视图的数据依赖发生改变（即数据的setter被调用）的时候，watcher会对比前后两个的数值是否发生变化，然后确定是否通知视图进行重新渲染这样就实现了所谓的数据对于视图的驱动。通俗地讲，它意味着我们在普通 HTML 模板中使用特殊的语法将 DOM “绑定”到底层数据。一旦创建了绑定，DOM 将与数据保持同步。每当修改了数据，DOM 便相应地更新。
+
+computed、methods、watch
+1、methods，computed的区别
+methods中就是普通的方法，通过调用执行，computed中的方法会监听自己的依赖，依赖发生变化方法会自动执行。
+2、computed与watch区别
+ computed: {
+    getmsg: function () {
+       return this.msg
+    }
+ },
+ watch:{
+    text:function () {
+       this.msg="dajiahao"
+    }
+}  
+在这个例子中，当msg发生变化，getmsg会自动执行，当text发生变化，watch里相应方法会执行。可以看到watch可以指定监听哪个值，当这个值发生变化时，去进行相应操作。
+
+单文件组件
+父子组件通信
+生命周期
+生命周期钩子函数
+* beforeCreate
+* created
+* beforeMount
+* mounted
+* beforeUpdate
+* updated
+* beforeDestroy
+* destroyed
+
+请求写在mounted和created里有什么区别？
+created:在模板渲染成html前调用，即通常初始化某些属性值，然后再渲染成视图。
+mounted:在模板渲染成html后调用，通常是初始化页面完成后，再对html的dom节点进行一些需要的操作。
+
+vue-router
+spa单页面应用
+单页应用也称为SPA，是将所有的活动局限于一个Web页面中，仅在该Web页面初始化时加载相应的HTML、JavaScript 和 CSS。加载完成，页面不在重新加载或跳转，仅仅是里面的组件或模块通过hash,或者history api来进行交互和跳转，并通过ajax拉取数据来实现响应功能，整个应用就一个html，所以叫单页面！
+
+vuex
+axios
+
+
