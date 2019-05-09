@@ -1,0 +1,609 @@
+
+函数
+1、 原型（prototype）
+1、 函数的prototype属性
+* 每个函数都有一个prototype属性，它默认指向一个Object空对象（即称为：原型对象）
+* 每个原型对象都有一个constructor属性，他指向函数对象
+2、 给原型对象添加属性（一般都是方法）
+* 作用：函数的所有实例对象都拥有原型中的属性（方法）
+3、 注意
+* 函数的显示原型指向的对象默认是空Object实例对象（但Object不是）
+* function fun(){
+* 
+*         }
+*         console.log(fun.prototype instanceof Object)//true
+*         console.log(Object.prototype instanceof Object)//false
+*         console.log(Function.prototype instanceof Object)//true
+
+* 所有函数都是Function的实例（包含Function）
+* console.log(fun.__proto__===Function.prototype)//true
+* console.log(Function.__proto__===Function.prototype)//true
+　　
+* Object的原型对象是原型链尽头
+* console.log(Object.prototype.__proto__)//null
+
+
+2、 显示原型和隐示原型
+1、 每个函数都有一个prototype属性，即显式原型（属性）
+2、 每个实例对象都有一个__proto__，可称为隐式原型（属性）
+3、 对象的隐式原型的值为其构造函数的显式原型的值
+4、 内存结构
+5、 总结
+* 函数的prototype属性：在定义函数时自动添加的，默认是一个空Object对象
+* 对象的__proto__属性：创建对象时自动添加得到，默认值为构造函数的prototype属性值
+* 程序员只能操作显示原型，但不能直接操作隐式原型（ES6之前）
+3、 原型链
+1、
+* 访问一个对象的属性时
+* 现在自身属性中查找，找到返回
+* 若果没有，再沿__proto__这条链向上查找，找到返回
+* 若果最终没有找到，返回underfined
+* 别名：隐式原型连
+* 作用：查找对象的属性（方法）
+1、 读取对象属性值时：会自动到原型中查找
+2、 设置对象属性值时：不会查找原型链，如果当前对象中没有属性，直接添加此属性并设置其值
+3、 方法一般定义在原型中，属性一般通过构造函数定义在对象本身上
+4、 Instanceof
+1、 instanceof是如何判断的？
+* 表达式：A  instanceof  B
+* 若果B函数的显示原型对象在A对象的原型链上，返回true，否则返回false
+2、 Function是通过new自己产生的实例
+
+
+案例：
+     
+        console.log(Object instanceof Function)//true
+        console.log(Object instanceof Object)//true  由图得：Object的隐式原型先找到Function，再由Function的隐式原型找到Object
+        console.log(Function instanceof Function)//true   Function是有自己new的
+        console.log(Function instanceof Object)//true   由图得：由Function的隐式原型找到Object
+5、 变量提升
+1、变量声明提升
+* 通过var定义（声明）的变量，在定义语句之前就可以访问到
+* 值：undefined
+2、函数声明提升
+* 通过function声明的函数，在之前就可以直接调用
+* 值：函数定义对象
+2、 问题：变量提升和函数提升是如何产生的
+1、 解析器在向执行环境中夹在数据时，对函数声明和函数表达式并非一视同仁。解析器会率先读取函数声明，并使其在执行任何代码之前可用（可以访问）。 说白了就是，用函数声明形式定义的函数支持变量提升 ，而函数表达式形式的不行。
+2、 这是因为js引擎在解析代码的时候，变量和函数在内的所有声明都会在任何代码被执行前首先被处理。当你看到 var a = 3; 时，可能会认为这是一个声明。但 JavaScript 实际上会将其看成两个声明： var a; 和 a = 3; 。
+3、 第一个定义声明是在编译阶段进行的。第二个赋值声明会被留在原地等待执行阶段（记住这是重点，赋值会留在原地），
+4、 然后变量和函数声明从它们在代码中出现的位置被“移动”到了最上面。这个过程就叫作提升。
+5、 记住：只有声明本身会被提升，而赋值或其他运行逻辑会留在原地不动，当然所有提升都是被提到当前变量所在作用域最上面等待执行。
+6、 执行上下文
+1、代码分类（位置）
+* 全局代码
+* 函数（局部）代码
+2、全局执行上下文
+* 	在执行全局代码前将window确定为全局执行上下文
+* 对全局数据进行预处理
+* Var定义的全局变量==>undefined，添加为window的属性
+* Function声明的全局函数==>赋值（fun），添加为window的方法
+* This==>赋值（window）
+* 开始执行全局代码
+3、函数执行上下文
+* 	在调用函数，准备执行函数体之前，创建对应的函数执行上下文对象（虚拟的，存在于栈中）
+* 对局部数据进行进行预处理
+* 形参变量==>赋值（实参）==>添加为执行上下文的属性
+* Arguments==>赋值（实参列表），添加为执行上下文的属性
+* Var定义的局部变量==>undefined，添加为执行上下文的属性
+* Function声明的函数==>赋值（fun），添加为执行上下文的方法
+* This==>赋值（调用函数的对象）
+* 开始执行函数代码
+7、 函数执行上下文栈
+1、 在全局代码执行之前，js引擎就会创建一个栈来存储管理所有的执行上下文对象
+2、 在全局执行上下文（window）确定后，将其添加到栈中（压栈）
+3、 在函数执行上下文创建后，将其添加到栈中（压栈）
+4、 在当前函数执行完后，将栈顶的对象移除（出栈）
+5、 当所有的代码执行完后，栈中只剩下window
+8、 作用域
+1、理解
+* 就是一块“地盘”，一个的代码段所在的区域
+* 他是静态的（相对于上下文对象），在编写代码时候就确定了
+2、 分类
+* 全局作用域
+* 函数作用域
+* 没有块作用域（ES6有了）
+3、 作用
+* 隔离变量，不同作用域下同名变量不会有冲突
+
+9、 作用域链
+1、 每次进入一个新的执行环境，都会创建一个用于搜索变量和函数的作用域链。
+2、 作用域链是函数被创建的作用域中对象的集合。
+3、 作用域链可以保证对执行环境有权访问的所有变量和函数的有序访问。
+
+10、 作用域与执行上下文的区别
+1、 区别一
+* 全局作用域之外，每个函数都会创建自己的作用域（一般来说，有n个函数，就有n+1个作用域），作用域在函数定义时就已经确定了，而不是在函数调用时
+* 全局执行上下文环境是在全局作用域确定后，js代码执行之前创建
+* 函数执行上下文环境是在调用函数时，函数体代码执行之前创建
+2、 区别二
+* 作用域是静态的，只要函数定义好就一直存在，且不会再变化
+* 执行上下文是动态的，调用函数时创建，函数调用结束时就会自动被释放
+3、 联系
+* 执行上下文（对象）是从属于所在的作用域
+* 全局上下文环境==>全局作用域
+* 函数上下文环境==>对应的函数使用域
+11、 闭包
+function fn1(){
+            var a=1;
+            function fn2(){//执行函数定义就会产生闭包（不用调用内部函数）
+                console.log(a);
+            }
+        
+
+1、如何产生闭包？
+* 当一个嵌套的函数内部（子）函数引用了嵌套的外部（父）函数的变量（函数）时，就产生了闭包
+2、闭包到底是什么？
+* 使用chrome调试查看
+* 理解一：闭包是嵌套的内部函数（绝大部分人）
+* 理解二：包含被引用变量（函数）的对象（极少数人）
+* 注意：闭包存在于嵌套的内部函数中
+3、产生闭包的条件？
+* 函数嵌套
+* 内部函数引用了外部函数的数据（变量/函数）
+4、常见的闭包
+1、 将函数作为另一个函数的返回值
+　　function fn1(){
+　　　　　　//此时闭包已经存在了（函数提升，内部函数对象已经创建了）但如果是函数定义的话  eg：fn2=function（）{}  此时在执行完函数定义后产生闭包，因为函数执行和函数定义执行是两码事
+            var a=2;
+           function fn2(){
+                a++;
+                console.log(a);
+            }
+            return fn2;
+        }
+        var f=fn1()
+        console.log(f())//3
+        console.log(f())//4
+
+2、 将函数作为实参传递给另一个函数调用
+function show(msg,time){
+            setTimeout(function(){
+                alert(msg);
+            },time)
+        }
+        show("hhhhhhhh",2000)
+5、闭包的作用
+1、 使用函数内部的变量在函数执行完后，仍然存活在内存中（延长了局部变量的生命周期）
+2、 让函数外部可以操作（读写）到函数内部的数据（变量/函数）
+问题：
+* 函数执行完后，函数内部声明的局部变量是否还存在？
+一般是不存在的，存在于闭包中的变量才可能存在
+* 在函数外部能直接访问函数内部的局部变量吗？
+不能，但我们可以通过闭包让外部操作它
+6、闭包的生命周期
+1、 产生：在嵌套内部函数定义执行完成时就产生了（不是在调用）
+2、 死亡：在嵌套的内部函数成为垃圾时（f=null时，包含闭包的函数对象成为垃圾对象）
+7、闭包的应用
+1、 定义js模块
+* 具有特定功能的js模块
+* 将所有的数组和功能都封装在一个函数内部（私有的）
+* 只向外部暴露一个包含n个方法的对象或函数
+* 模块使用者，只需要通过模块暴露的对象调用方法来实现对应的功能
+写法一
+function myModule(){
+    //私有数据
+    var msg="My atguigu"
+    //曹组数据的函数
+    function doSomething(){
+        console.log("doSomething"+msg.toUpperCase())//大写输出
+    }
+    function doOtherthing(){
+        console.log("doOtherthing"+msg.toUpperCase())//大写输出
+    }
+
+    //向外暴露对象（给外部使用的方法）
+    return{
+        doSomething:doSomething,
+        doOtherthing:doOtherthing
+    }
+}
+功能调用
+    <script>
+        var module=myModule();
+        module.doSomething();
+        module.doOtherthing();
+    </script>
+
+
+写法二
+(function(){
+    var msg="My atguigu"
+    //曹组数据的函数
+    function doSomething(){
+        console.log("doSomething"+msg.toUpperCase())//大写输出
+    }
+    function doOtherthing(){
+        console.log("doOtherthing"+msg.toUpperCase())//大写输出
+    }
+
+    window.myModule2={
+        doSomething:doSomething,
+        doOtherthing:doOtherthing
+    }
+})()
+功能调用
+    <script>
+        myModule2.doSomething();
+        myModule2.doOtherthing();
+    </script>
+12、 闭包的缺点及其解决
+1、 缺点
+* 函数执行完后，函数内的局部变量没有释放，占用内存时间会变长
+* 容易造成内存泄露
+2、 解决
+* 能不用闭包就不用
+* 及时释放（f=null  //让内部函数成为垃圾对象—>回收闭包）
+13、 内存溢出与内存泄漏
+1、 内存溢出
+* 一种程序运行出现的错误
+* 当程序运行需要的内存超过了剩余的内存时，就抛出内存溢出的错误
+2、 内存泄漏
+* 占用内存没有及时释放
+* 常见的内存泄漏
+* 意外的全局变量
+* 没有及时清理的计时器或回调函数
+* 闭包
+14、 闭包面试题
+1、 写在对象里
+var name="my window";
+        var object1={
+            name:"my object",
+            getName:function(){
+                return function(){
+                    return this.name;//此时this指向window，所以输出“my window”
+                }
+            }
+        }
+        alert(object1.getName()());
+
+* 所以说这个代码里没有闭包（内部函数没有引用外部函数变量）
+
+
+var name="my window";
+        var object2={
+            name:"my object",
+            getName:function(){
+                var that = this;
+                return function(){
+                    return that.name;//此时this指向object2，所以输出“my object"
+                }
+            }
+        }
+        alert(object2.getName()());
+
+
+* 这个代码里有闭包（that）
+15、 对象创建模式
+1、对象字面量模式
+* 套路：使用{ }创建对象，同时指定属性/方法
+* 使用场景：起始时对象内部数据是确定的
+* 问题：如果创建多个对象，有重复代码
+代码:
+//1、对象自面量
+        var p={
+            name:"Tom",
+            age:20,
+            getName:function(name){
+                this.name=name;
+            }
+        }
+
+        console.log(p.name,p.age);//Tom,20
+        p.getName("liulin");
+        console.log(p.name,p.age);//liulin,20
+2、工厂模式
+* 套路：通过工厂函数动态创建对象并返回
+* 适用场景：需要创建多个对象
+* 问题：对象没有一个具体的类型，都是object类型
+代码：
+//工厂模式
+        function craeatePerson(name,age){//返回一个对象的函数都可以称为工厂函数
+            var obj={
+                name:name,
+                age:age,
+                setName:function(name){
+                    this.name=name;
+                }
+            }
+            return obj;
+        }
+
+        //创建两个人
+        var p1=craeatePerson("tom",18);
+        var p1=craeatePerson("jack",30);
+
+3、自定义构造函数模式
+* 套路:自定义构造函数，通过new创建对象
+* 适用场景：需要创建多个类型确定对象
+* 问题：每个对象都有相同数据，浪费内存
+代码：
+//构造函数模式
+        function Person(name,age){
+            this.name=name;
+            this.age=age;
+            this.setName=function(name){
+                this.name=name;
+            }
+        }
+        var p1=new Person("Tom",18);
+        p1.setName("Jack");
+        console.log(p1.name,p1.age);
+        console.log(p instanceof Person)//ture
+
+        function Student(name,price){
+            this.name=name;
+            this.price=price;
+        }
+        var s=new Student("liulin",10000);
+        console.log(s instanceof Student)//ture
+4、构造函数+原型的组合模式
+* 套路：自定义构造函数，属性在函数中初始化，方法添加在原型上
+* 适用场景：需要创建多个类型确定的对象
+代码：
+//构造函数+原型的组合模式
+        function Person1(){
+            this.name=name;
+            this.age=age;
+        }
+        Person1.prototype.setName=function(name){
+            this.name=name;
+        }
+
+        var p1=new Person1("Tom1",28);
+16、 继承模式
+1、原型链继承
+1、套路
+1、 定义父类型构造函数
+2、 给父类型的原型添加方法
+3、 定义子类型的构造函数
+4、 创建父类型的对象赋值给子类型的原型
+5、 将子类型原型的构造函数属性设置为子类型
+6、 给子类型原型添加方法
+7、 创建子类型的对象：可以调用父类型的方法
+2、关键
+	1、子类型的原型为父类型的一个实例对象
+代码：
+//父类型
+        function Super(){
+            this.sup="super";
+        }
+        //父原型
+        Super.prototype.showSuper=function(){
+            alert(this.sup);
+        }
+
+        //子类型
+        function Sub(){
+            this.sub="sub";
+        }
+
+        //子类型的原型为父类型的一个实例对象，实现继承
+        Sub.prototype=new Super();
+		//让子类型的原型的constructor指向子类型(如果不设置，指向的是Super)
+		Sub.prototype.constructor=Sub;
+        //子原型
+        Sub.prototype.showSub=function(){
+            alert(this.sub);
+        }
+        var sub=new Sub();
+        sub.showSuper();//子对象访问父类型原型
+2、 借用构造函数继承（假的）
+1、 套路
+* 定义父类型构造函数
+* 定义子类型构造函数
+* 在子类型构造函数中调用父类型构造
+2、 关键
+* 在子类型构造函数中通用call（）调用父类型构造函数
+代码：
+function Person(name,age){
+            this.name=name;
+            this.age=age;
+        }
+
+function Student(name, age, price){
+            Person.call(this,name,age);
+            this.price=price;
+        }
+
+var s=new Student("Tom",20,12222);
+console.log(s.name,s.age,s.price);
+
+3、原型链+借用构造函数的组合继承
+1、 利用原型链实现父类型对象的方法继承
+2、 利用call（）借用父类型构建函数初始化相同属性
+代码：
+function Person(name,age){
+            this.name=name;
+            this.age=age;
+        }
+        Person.prototype.setName=function(name){
+            this.name=name;
+        }
+
+        function Student(name, age, price){
+            Person.call(this,name,age);
+            this.price=price;
+        }
+        Student.prototype=new Person();//实现继承
+        Student.prototype.constructor=Student;
+        Student.prototype.setPrice=function(price){
+            this.price=price;
+        }
+
+        var s=new Student("Tom",20,10000);
+        s.setName("liulin");
+        s.setPrice(12000);
+        console.log(s.name,s.age,s.price)
+
+17、 线程机制与事件机制
+1、 进程与线程
+1、 进程（process）
+* 程序的一次执行，他占有一片独立的内存空间
+* 可以通过windows任务管理器查看进程
+2、 线程（thread）
+* 进程内一个独立的执行单元
+* 是程序执行的一个完整流程
+* 是CPU的最小调度单元
+3、 图解
+
+4、 相关知识
+* 应用程序必须运行在某个进程的某个线程上
+* 一个进程中至少有一个运行的线程：主线程，进程启动后自动创建
+* 一个进程中也可以同时运行多个线程，我们会说程序是多线程运行的
+* 一个进程内的数据可以提供其中的多个线程直接共享
+* 多个线程之间的数据是不能直接共享的
+* 线程池（thread pool）：保存多个线程对象的容器，实现线程对象的反复利用
+5、 相关问题
+* 何为多进程与多线程？
+* 多进程运行：一应用程序可以同时启动多个实例运行
+* 多线程：在一进程内，同时有多个线程运行
+* 比较多线程与单线程？
+* 多线程：
+* 优点：
+* 1、能有效提升CPU利用率
+* 缺点
+* 创建多线程开销
+* 线程间切换开销
+* 死锁与状态锁同步问题
+* 单线程
+* 优点
+* 顺序编程简单易懂
+* 缺点
+* 效率低
+* Js是单线程还是多线程？
+* Js是单线程运行的
+* 但使用H5中的Web Workers可以多线程运行
+* 浏览器是单线程还是多线程？
+* 都是多线程运行的
+* 浏览器运行是单线程还是多进程？
+* 有的是单进程
+* Firefox
+* 老版IE
+* 有的是多进程
+* Chrome
+* 新版IE
+* 如何查看浏览器是否是多进程运行的呢？
+18、 浏览器内核
+1、 支撑浏览器运行的最核心的程序
+2、 不同浏览器可能不一样
+i. Chrome，Safari：webkit
+ii. Firefox：Gecko
+iii. IE：Trident
+iv. 360，搜狗等国内浏览器：Trident + webkit
+3、 内核由很多模块组成
+主线程
+
+1、 js引擎模块：负责js程序的编译与运行
+2、 html，Css文档解析模块：负责页面文档的解析
+3、 DOM/CSS模块：负责dom/css在内存中的相关处理
+4、 布局和渲染模块：附则页面的布局和效果的绘制（内存的对象）
+5、 ………………….
+
+分线程
+1、 定时器模块：负责定时器的管理
+2、 DOM时间响应模块：负责事件的管理
+3、 网络请求模块：负责ajax请求
+19、 定时器引发的思考
+1、 定时器真的是定时执行的吗？
+* 定时器不能保证真正定时执行
+* 一般会延迟一丁点（可以接受），也有可能延迟很长时间（不能接受）
+2、 定时器回调函数是在分线程执行的吗？
+* 在主线程执行的，js是单线程的
+3、 定时器是如何实现的？
+* 事件循环模型
+代码：
+<body>
+    <button id="btn">启动定时器</button>
+    <script>
+        var btn=document.getElementById("btn");
+
+        btn.onclick=function(){
+            var start=Date.now();
+        console.log("启动定时器前。。。")
+        setTimeout(function(){
+            console.log("定时器执行了",Date.now()-start);
+        },200)
+        console.log("启动定时器后。。。")
+
+        //做一个长时间的工作
+        for(var i=0;i<1000000000;i++){
+
+        }
+        }
+       
+    </script>
+</body>
+
+20、 Js是单线程的
+1、 如何证明js执行是单线程的？
+* setTimeout（）的回调函数是在主线程执行的
+* 定时器回调函数只有在运行栈中的代码全部执行完后才有可能执行
+2、 为什么js要单线程模式，而不是多线程模式？
+* Javascript的单线程，与他的用途有关
+* 作为浏览器的脚本语言，JavaScript的主要用途是与用户互动，以及操作DOM
+* 这决定了他只能是单线程，否则会带来很复杂的同步问题
+3、 代码的分类
+* 初始化代码
+* 回调函数
+4、 js引擎执行代码的基本流程  
+* 先执行初始化代码：包含一些特别的代码   回调函数（异步执行）
+* 设置定时器
+* 绑定监听
+* 发送ajax请求
+* 后面在某个时刻才会执行回调代码
+代码：
+setTimeout(function(){
+            console.log("timeout  22222")
+        },2000)
+        setTimeout(function(){
+            console.log("timeout  11111")
+        },1000)
+        setTimeout(function(){
+            console.log("timeout  00000");//在初始化代码执行完后，再执行
+        },0)
+
+        function fn(){
+            console.log("fn()");
+        }
+        fn();
+
+        console.log("alert()之前");
+        alert("--------");//暂停当前主线程的执行，同时暂停计时器，点击确定后，恢复程序执行和计时
+        console.log("alert()之后");
+结果：
+
+21、 事件循环模型
+1、 模型原理图
+
+2、 所有代码分类
+* 初始化执行代码（同步代码）：包含绑定dom事件监听，设置定时器，发送Ajax请求的代码
+* 回调执行代码（异步代码）：处理回调逻辑
+3、 js引擎执行代码的基本流程：
+* 初始化代码==>回调代码
+4、 模型的两个重要组成部分：
+* 事件管理模块
+* 回调队列
+5、 模型的运转流程
+* 执行初始化代码，将事件回调函数交给对应模块管理
+* 当事件发生时，管理模块将会将回调函数及其数据添加到回调队列中
+* 只有当初始化代码执行完成后（可能要一定时间），才会遍历读取回调队列中的回调函数执行
+代码：
+<button id="btn">按钮</button>
+    <script>
+        function fn1(){
+            console.log("fn1()");
+        }    
+        fn1();
+        document.getElementById("btn").onclick=function(){
+            console.log("点击了按钮。。");
+        }
+        setTimeout(function(){
+            console.log("定时器执行了。。")
+        },3000);
+        function fn2(){
+            console.log("fn2()")
+        }
+        fn2();
+    </script>
+结果：
